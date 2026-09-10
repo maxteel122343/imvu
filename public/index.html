@@ -567,7 +567,9 @@
 			try {
 				const res = await fetch(`/api/room/join/${roomId}`, { method: 'POST', headers: { 'x-active-user': activeUser } });
 				const result = await res.json();
-				alert(`🎉 ${result.message}\n\nLink IMVU: ${result.data.imvuRoomUrl}`);
+				
+				// Abrir a URL oficial do IMVU Next em nova aba para conectar o cliente real
+				window.open(result.data.nextWebUrl, '_blank');
 			} catch (err) {
 				alert('Falha ao conectar na sala.');
 			}
