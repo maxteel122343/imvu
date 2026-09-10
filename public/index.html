@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>IMVU Dashboard Completo</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+			--panel-bg: rgba(30, 41, 59, 0.75);
+			--panel-border: rgba(255, 255, 255, 0.12);
+			--accent-purple: #8b5cf6;
+			--accent-pink: #ec4899;
+			--text-primary: #f8fafc;
+			--text-secondary: #94a3b8;
+		}
+
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+			font-family: 'Plus Jakarta Sans', sans-serif;
+		}
+
+		body {
+			min-height: 100vh;
+			background: var(--bg-gradient);
+			color: var(--text-primary);
+			display: flex;
+			justify-content: center;
+			align-items: flex-start;
+			padding: 20px;
+		}
+
+		.app-wrapper {
+			width: 100%;
+			max-width: 1000px;
+			margin-top: 20px;
+		}
+
+		/* Login View */
+		.login-card {
+			max-width: 440px;
+			margin: 60px auto 0;
+			background: var(--panel-bg);
+			backdrop-filter: blur(16px);
+			border: 1px solid var(--panel-border);
+			border-radius: 24px;
+			padding: 36px 32px;
+			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+		}
+
+		.header { text-align: center; margin-bottom: 28px; }
+		.badge {
+			display: inline-block;
+			background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
+			color: white;
+			font-size: 11px;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 1.2px;
+			padding: 4px 12px;
+			border-radius: 20px;
+			margin-bottom: 12px;
+		}
+
+		h1 {
+			font-size: 26px;
+			font-weight: 800;
+			background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+		}
+
+		.form-group { margin-bottom: 20px; }
+		label { display: block; font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 8px; }
+		input {
+			width: 100%;
+			padding: 14px 16px;
+			background: rgba(15, 23, 42, 0.6);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 12px;
+			color: white;
+			font-size: 14px;
+			outline: none;
+		}
+		input:focus { border-color: var(--accent-purple); }
+
+		button {
+			width: 100%;
+			padding: 14px;
+			background: linear-gradient(90deg, #7c3aed 0%, #db2777 100%);
+			border: none;
+			border-radius: 12px;
+			color: white;
+			font-size: 15px;
+			font-weight: 700;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+		button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(219, 39, 119, 0.4); }
+
+		.status-box {
+			margin-top: 20px;
+			padding: 14px;
+			border-radius: 12px;
+			font-size: 13px;
+			display: none;
+		}
+		.status-box.error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; }
+		.status-box.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); color: #86efac; }
+
+		/* Dashboard View */
+		.dashboard-layout {
+			display: none;
+			grid-template-columns: 260px 1fr;
+			gap: 20px;
+		}
+
+		.sidebar {
+			background: var(--panel-bg);
+			backdrop-filter: blur(16px);
+			border: 1px solid var(--panel-border);
+			border-radius: 20px;
+			padding: 24px 20px;
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+		}
+
+		.user-mini-card {
+			text-align: center;
+			padding-bottom: 16px;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		}
+
+		.user-mini-card img {
+			width: 80px;
+			height: 80px;
+			border-radius: 50%;
+			border: 2px solid var(--accent-purple);
+			margin-bottom: 10px;
+		}
+
+		.nav-menu {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+		}
+
+		.nav-item {
+			padding: 12px 16px;
+			border-radius: 12px;
+			background: transparent;
+			color: var(--text-secondary);
+			border: none;
+			text-align: left;
+			font-size: 14px;
+			font-weight: 600;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.nav-item.active, .nav-item:hover {
+			background: rgba(255, 255, 255, 0.1);
+			color: white;
+		}
+
+		.main-content {
+			background: var(--panel-bg);
+			backdrop-filter: blur(16px);
+			border: 1px solid var(--panel-border);
+			border-radius: 20px;
+			padding: 28px;
+			min-height: 520px;
+		}
+
+		.tab-content { display: none; }
+		.tab-content.active { display: block; }
+
+		.section-title {
+			font-size: 20px;
+			font-weight: 700;
+			margin-bottom: 20px;
+		}
+
+		.grid-list {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+			gap: 16px;
+		}
+
+		.card-item {
+			background: rgba(15, 23, 42, 0.5);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			border-radius: 14px;
+			padding: 16px;
+			text-align: center;
+		}
+
+		.card-item img {
+			width: 64px;
+			height: 64px;
+			border-radius: 50%;
+			margin-bottom: 10px;
+		}
+
+		.search-box {
+			display: flex;
+			gap: 10px;
+			margin-bottom: 20px;
+		}
+
+		.search-box input {
+			flex: 1;
+		}
+
+		.search-box button {
+			width: auto;
+			padding: 0 24px;
+		}
+
+		.notif-item {
+			background: rgba(15, 23, 42, 0.5);
+			border-left: 4px solid var(--accent-purple);
+			padding: 14px 16px;
+			border-radius: 8px;
+			margin-bottom: 12px;
+		}
+		.notif-item .time { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+	</style>
+</head>
+<body>
+
+	<div class="app-wrapper">
+
+		<!-- Tela de Login -->
+		<div id="loginCard" class="login-card">
+			<div class="header">
+				<span class="badge">IMVU.js Suite</span>
+				<h1>Entrar no IMVU</h1>
+				<p style="color: var(--text-secondary); font-size: 14px; margin-top: 6px;">Acesse Notificações, DM, Salas e Pesquisas</p>
+			</div>
+
+			<form id="loginForm">
+				<div class="form-group">
+					<label>Usuário / Email</label>
+					<input type="text" id="username" placeholder="Seu nome de usuário IMVU" required>
+				</div>
+				<div class="form-group">
+					<label>Senha</label>
+					<input type="password" id="password" placeholder="••••••••••••" required>
+				</div>
+				<div class="form-group">
+					<label>Código 2FA (opcional)</label>
+					<input type="text" id="twoFactorCode" placeholder="Ex: 123456">
+				</div>
+				<button type="submit" id="btnSubmit">Entrar no Dashboard</button>
+			</form>
+
+			<div id="statusBox" class="status-box"></div>
+		</div>
+
+		<!-- Dashboard Completo -->
+		<div id="dashboardLayout" class="dashboard-layout">
+			<div class="sidebar">
+				<div class="user-mini-card">
+					<img id="sideAvatar" src="" alt="Avatar">
+					<h3 id="sideName" style="font-size: 16px;"></h3>
+					<p id="sideUsername" style="font-size: 12px; color: var(--text-secondary);"></p>
+				</div>
+
+				<div class="nav-menu">
+					<button class="nav-item active" onclick="switchTab('notifs')">🔔 Notificações & DMs</button>
+					<button class="nav-item" onclick="switchTab('rooms')">🎪 Salas de Chat</button>
+					<button class="nav-item" onclick="switchTab('friends')">👥 Meus Amigos</button>
+					<button class="nav-item" onclick="switchTab('search')">🔍 Pesquisar Usuário</button>
+				</div>
+
+				<button id="btnLogout" style="background: rgba(239,68,68,0.2); color: #fca5a5; margin-top: auto;">Sair</button>
+			</div>
+
+			<div class="main-content">
+
+				<!-- Aba Notificações -->
+				<div id="tab-notifs" class="tab-content active">
+					<h2 class="section-title">Enviar Mensagem Direta (DM)</h2>
+					<div class="search-box" style="margin-bottom: 24px;">
+						<input type="text" id="dmRecipient" placeholder="Nome do Avatar (ex: Vinii)" style="max-width: 200px;">
+						<input type="text" id="dmText" placeholder="Escreva sua mensagem privada...">
+						<button onclick="sendDirectMessage()">✉️ Enviar DM</button>
+					</div>
+
+					<h2 class="section-title">Feed de Notificações & Mensagens</h2>
+					<div id="notifsContainer">Carregando notificações...</div>
+				</div>
+
+				<!-- Aba Salas -->
+				<div id="tab-rooms" class="tab-content">
+					<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+						<h2 class="section-title" style="margin: 0;">Salas de Chat IMVU</h2>
+						<div style="display: flex; gap: 8px;">
+							<button id="btnAllRooms" onclick="filterRoomsMode('all')" style="padding: 6px 14px; font-size: 12px;">🌍 Todas as Salas</button>
+							<button id="btnFavRooms" onclick="filterRoomsMode('fav')" style="padding: 6px 14px; font-size: 12px; background: rgba(255,255,255,0.15);">⭐ Minhas Favoritas</button>
+						</div>
+					</div>
+
+					<div class="search-box" style="margin-bottom: 20px;">
+						<input type="text" id="roomSearchQuery" placeholder="Pesquise por Nome da Sala ou ID (ex: 101, Brasil, VIP)..." onkeyup="if(event.key==='Enter') searchRooms()">
+						<button onclick="searchRooms()">🔎 Pesquisar Sala</button>
+					</div>
+
+					<div id="roomsContainer" class="grid-list">Carregando salas de chat...</div>
+				</div>
+
+				<!-- Aba Amigos -->
+				<div id="tab-friends" class="tab-content">
+					<h2 class="section-title">Lista de Amigos</h2>
+					<div id="friendsContainer" class="grid-list">Carregando lista de amigos...</div>
+				</div>
+
+				<!-- Aba Pesquisar -->
+				<div id="tab-search" class="tab-content">
+					<h2 class="section-title">Pesquisar Usuário no IMVU</h2>
+					<div class="search-box">
+						<input type="text" id="searchQuery" placeholder="Digite o nome do avatar...">
+						<button onclick="searchUser()">Buscar</button>
+					</div>
+					<div id="searchResult" class="grid-list"></div>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+
+	<script>
+		let activeUser = localStorage.getItem('imvu_active_user') || '';
+
+		const loginForm = document.getElementById('loginForm');
+		const statusBox = document.getElementById('statusBox');
+
+		function showStatus(msg, isError = false) {
+			statusBox.textContent = msg;
+			statusBox.className = `status-box ${isError ? 'error' : 'success'}`;
+			statusBox.style.display = 'block';
+		}
+
+		loginForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const username = document.getElementById('username').value.trim();
+			const password = document.getElementById('password').value;
+			const twoFactorCode = document.getElementById('twoFactorCode').value.trim();
+
+			document.getElementById('btnSubmit').disabled = true;
+
+			try {
+				const response = await fetch('/api/login', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ username, password, twoFactorCode })
+				});
+
+				const result = await response.json();
+				if (!result.success) throw new Error(result.message);
+
+				activeUser = result.data.username;
+				localStorage.setItem('imvu_active_user', activeUser);
+
+				document.getElementById('sideAvatar').src = result.data.avatarPortraitImage || result.data.avatarImage || 'https://via.placeholder.com/80';
+				document.getElementById('sideName').textContent = result.data.displayName || result.data.username;
+				document.getElementById('sideUsername').textContent = `@${result.data.username}`;
+
+				document.getElementById('loginCard').style.display = 'none';
+				document.getElementById('dashboardLayout').style.display = 'grid';
+
+				loadNotifications();
+			} catch (err) {
+				showStatus(err.message, true);
+			} finally {
+				document.getElementById('btnSubmit').disabled = false;
+			}
+		});
+
+		function switchTab(tabName) {
+			document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+			document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+			event.target.classList.add('active');
+			document.getElementById(`tab-${tabName}`).classList.add('active');
+
+			if (tabName === 'notifs') loadNotifications();
+			if (tabName === 'rooms') loadRooms();
+			if (tabName === 'friends') loadFriends();
+		}
+
+		async function loadNotifications() {
+			const container = document.getElementById('notifsContainer');
+			container.innerHTML = 'Carregando...';
+			try {
+				const res = await fetch('/api/notifications', { headers: { 'x-active-user': activeUser } });
+				const { data } = await res.json();
+				container.innerHTML = data.map(n => {
+					let borderStyle = 'var(--accent-purple)';
+					if (n.type === 'status_online') borderStyle = '#22c55e';
+					if (n.type === 'status_offline') borderStyle = '#ef4444';
+					if (n.type === 'dm') borderStyle = '#ec4899';
+
+					return `
+						<div class="notif-item" style="border-left-color: ${borderStyle};">
+							<strong>${n.title}</strong>
+							<p style="font-size: 13px; margin-top: 4px;">${n.message}</p>
+							<div class="time">${n.time}</div>
+						</div>
+					`;
+				}).join('');
+			} catch (err) {
+				container.innerHTML = 'Erro ao carregar notificações.';
+			}
+		}
+
+		async function sendDirectMessage() {
+			const recipientUsername = document.getElementById('dmRecipient').value.trim();
+			const messageText = document.getElementById('dmText').value.trim();
+
+			if (!recipientUsername || !messageText) {
+				alert('Por favor, informe o nome do avatar destinatário e a mensagem.');
+				return;
+			}
+
+			try {
+				const res = await fetch('/api/messages/send', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json', 'x-active-user': activeUser },
+					body: JSON.stringify({ recipientUsername, messageText })
+				});
+
+				const result = await res.json();
+				if (!result.success) throw new Error(result.message);
+
+				alert(`✉️ ${result.message}`);
+				document.getElementById('dmText').value = '';
+				loadNotifications();
+			} catch (err) {
+				alert(`Erro ao enviar mensagem: ${err.message}`);
+			}
+		}
+
+		let currentRoomsMode = 'all';
+
+		function filterRoomsMode(mode) {
+			currentRoomsMode = mode;
+			document.getElementById('btnAllRooms').style.background = mode === 'all' ? 'linear-gradient(90deg, #7c3aed 0%, #db2777 100%)' : 'rgba(255,255,255,0.15)';
+			document.getElementById('btnFavRooms').style.background = mode === 'fav' ? 'linear-gradient(90deg, #7c3aed 0%, #db2777 100%)' : 'rgba(255,255,255,0.15)';
+			
+			if (mode === 'fav') {
+				loadFavoriteRooms();
+			} else {
+				loadRooms();
+			}
+		}
+
+		async function loadRooms(searchQuery = '') {
+			const container = document.getElementById('roomsContainer');
+			container.innerHTML = 'Carregando salas...';
+			try {
+				const url = searchQuery ? `/api/rooms?q=${encodeURIComponent(searchQuery)}` : '/api/rooms';
+				const res = await fetch(url, { headers: { 'x-active-user': activeUser } });
+				const { data } = await res.json();
+
+				// Carregar lista de favoritos para definir a estrela do botão
+				const favsRes = await fetch('/api/rooms/favorites', { headers: { 'x-active-user': activeUser } });
+				const favsData = await favsRes.json();
+				const favIds = new Set((favsData.data || []).map(f => f.id));
+
+				if (!data || data.length === 0) {
+					container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">Nenhuma sala encontrada com este nome ou ID.</p>';
+					return;
+				}
+
+				container.innerHTML = data.map(r => {
+					const isFav = favIds.has(String(r.id));
+					return `
+						<div class="card-item">
+							<div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">ID: #${r.id}</div>
+							<h4 style="font-size: 14px; margin-bottom: 6px;">${r.name}</h4>
+							<p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">${r.description || 'Sala pública no IMVU'}</p>
+							<div style="font-size: 11px; font-weight: 700; color: var(--accent-pink); margin-bottom: 12px;">
+								Capacidade: ${r.capacity} pessoas
+							</div>
+							<div style="display: flex; gap: 6px; justify-content: center;">
+								<button onclick="joinRoom('${r.id}', '${r.name.replace(/'/g, "\\'")}')" style="padding: 6px 10px; font-size: 11px; flex: 1;">🚪 Entrar</button>
+								<button onclick="toggleFavoriteRoom('${r.id}', '${r.name.replace(/'/g, "\\'")}', '${(r.description||'').replace(/'/g, "\\'")}', ${r.capacity})" style="padding: 6px 10px; font-size: 11px; background: rgba(255,255,255,0.15);">
+									${isFav ? '⭐ Favorita' : '☆ Favoritar'}
+								</button>
+							</div>
+						</div>
+					`;
+				}).join('');
+			} catch (err) {
+				container.innerHTML = 'Erro ao carregar salas.';
+			}
+		}
+
+		function searchRooms() {
+			const query = document.getElementById('roomSearchQuery').value.trim();
+			loadRooms(query);
+		}
+
+		async function loadFavoriteRooms() {
+			const container = document.getElementById('roomsContainer');
+			container.innerHTML = 'Carregando suas salas favoritas...';
+			try {
+				const res = await fetch('/api/rooms/favorites', { headers: { 'x-active-user': activeUser } });
+				const { data } = await res.json();
+
+				if (!data || data.length === 0) {
+					container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">Você ainda não tem salas favoritas ativas. Clique em "☆ Favoritar" para salvar salas!</p>';
+					return;
+				}
+
+				container.innerHTML = data.map(r => `
+					<div class="card-item" style="border: 1px solid var(--accent-purple);">
+						<div style="font-size: 11px; color: #eab308; font-weight: 700; margin-bottom: 4px;">⭐ SALA FAVORITA (#${r.id})</div>
+						<h4 style="font-size: 14px; margin-bottom: 6px;">${r.name}</h4>
+						<p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">${r.description || 'Sala favorita'}</p>
+						<div style="font-size: 11px; font-weight: 700; color: var(--accent-pink); margin-bottom: 12px;">
+							Capacidade: ${r.capacity} pessoas
+						</div>
+						<div style="display: flex; gap: 6px; justify-content: center;">
+							<button onclick="joinRoom('${r.id}', '${r.name.replace(/'/g, "\\'")}')" style="padding: 6px 10px; font-size: 11px; flex: 1;">🚪 Entrar</button>
+							<button onclick="toggleFavoriteRoom('${r.id}', '${r.name.replace(/'/g, "\\'")}', '${(r.description||'').replace(/'/g, "\\'")}', ${r.capacity})" style="padding: 6px 10px; font-size: 11px; background: rgba(239, 68, 68, 0.2); color: #fca5a5;">🗑️ Remover</button>
+						</div>
+					</div>
+				`).join('');
+			} catch (err) {
+				container.innerHTML = 'Erro ao carregar salas favoritas.';
+			}
+		}
+
+		async function toggleFavoriteRoom(roomId, roomName, description, capacity) {
+			try {
+				const res = await fetch('/api/rooms/favorite/toggle', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json', 'x-active-user': activeUser },
+					body: JSON.stringify({ roomId, roomName, description, capacity })
+				});
+				const result = await res.json();
+				alert(result.message);
+
+				if (currentRoomsMode === 'fav') {
+					loadFavoriteRooms();
+				} else {
+					loadRooms(document.getElementById('roomSearchQuery').value.trim());
+				}
+			} catch (err) {
+				alert('Erro ao atualizar favorito.');
+			}
+		}
+
+		async function joinRoom(roomId, roomName) {
+			try {
+				const res = await fetch(`/api/room/join/${roomId}`, { method: 'POST', headers: { 'x-active-user': activeUser } });
+				const result = await res.json();
+				alert(`🎉 ${result.message}\n\nLink IMVU: ${result.data.imvuRoomUrl}`);
+			} catch (err) {
+				alert('Falha ao conectar na sala.');
+			}
+		}
+
+		async function loadFriends() {
+			const container = document.getElementById('friendsContainer');
+			container.innerHTML = 'Carregando amigos...';
+			try {
+				const res = await fetch('/api/friends', { headers: { 'x-active-user': activeUser } });
+				const { data } = await res.json();
+				if (data.length === 0) {
+					container.innerHTML = '<p>Nenhum amigo encontrado ou lista privada.</p>';
+					return;
+				}
+				container.innerHTML = data.map(f => {
+					const statusBadge = f.isOnline 
+						? `<span style="display:inline-block; padding: 2px 8px; font-size: 10px; font-weight:700; border-radius:10px; background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.4); margin-bottom:8px;">🟢 ONLINE</span>`
+						: `<span style="display:inline-block; padding: 2px 8px; font-size: 10px; font-weight:700; border-radius:10px; background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.4); margin-bottom:8px;">🔴 OFFLINE</span>`;
+
+					return `
+						<div class="card-item" style="border: 1px solid ${f.isOnline ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.08)'};">
+							<img src="${f.avatarPortraitImage || f.avatarImage || 'https://via.placeholder.com/64'}" alt="Friend">
+							<h4 style="font-size: 14px;">${f.displayName || f.username}</h4>
+							<p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">@${f.username}</p>
+							${statusBadge}
+							<br>
+							<button onclick="viewUserProfile('${f.username}')" style="padding: 6px 10px; font-size: 11px; background: rgba(255,255,255,0.15);">👤 Ver Perfil</button>
+						</div>
+					`;
+				}).join('');
+			} catch (err) {
+				container.innerHTML = 'Erro ao carregar amigos.';
+			}
+		}
+
+		async function searchUser() {
+			const query = document.getElementById('searchQuery').value.trim();
+			if (!query) return;
+			const container = document.getElementById('searchResult');
+			container.innerHTML = 'Buscando...';
+			try {
+				const res = await fetch(`/api/search/user?q=${encodeURIComponent(query)}`, { headers: { 'x-active-user': activeUser } });
+				const { data } = await res.json();
+				if (data.length === 0) {
+					container.innerHTML = '<p>Nenhum usuário encontrado.</p>';
+					return;
+				}
+				container.innerHTML = data.map(u => `
+					<div class="card-item">
+						<img src="${u.avatarPortraitImage || u.avatarImage || 'https://via.placeholder.com/64'}" alt="User">
+						<h4 style="font-size: 14px;">${u.displayName || u.username}</h4>
+						<p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">@${u.username}</p>
+						<button onclick="viewUserProfile('${u.username}')" style="padding: 8px 12px; font-size: 12px;">👤 Ver Perfil Completo</button>
+					</div>
+				`).join('');
+			} catch (err) {
+				container.innerHTML = 'Erro ao buscar usuário.';
+			}
+		}
+
+		async function viewUserProfile(username) {
+			try {
+				const res = await fetch(`/api/user/profile/${encodeURIComponent(username)}`, { headers: { 'x-active-user': activeUser } });
+				const { data } = await res.json();
+				alert(`👤 PERFIL IMVU: @${data.username}\n\nNome: ${data.displayName}\nPaís: ${data.country}\nIdade: ${data.age}\nRegistrado: ${data.registered}\nVIP: ${data.isVip ? 'Sim' : 'Não'}\nAP: ${data.isAp ? 'Sim' : 'Não'}\nCriador: ${data.isCreator ? 'Sim' : 'Não'}\n\nBio: ${data.bio}`);
+			} catch (err) {
+				alert('Erro ao carregar perfil do usuário.');
+			}
+		}
+
+		document.getElementById('btnLogout').addEventListener('click', () => {
+			localStorage.removeItem('imvu_active_user');
+			location.reload();
+		});
+	</script>
+</body>
+</html>

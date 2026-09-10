@@ -1,0 +1,22 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "./src",
+		"outDir": "./dist/cjs",
+		"types": [
+			"jest",
+			"node"
+		]
+	},
+	"include": [
+		"./src/**/*.ts"
+	],
+	"references": [
+		{
+			"path": "../client"
+		},
+		{
+			"path": "../chkn"
+		}
+	]
+}
